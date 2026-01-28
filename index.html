@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceCart - Voice-Powered Grocery Search for Instacart</title>
+    <meta name="description" content="Search Instacart with your voice using Apple Shortcuts. Add items to your grocery list hands-free. No subscription required.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #ffffff 100%);
+        }
+        .store-card:hover {
+            transform: translateY(-4px);
+        }
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            50% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(0.8); opacity: 0.8; }
+        }
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .scroll-ribbon {
+            display: flex;
+            animation: scroll-left 40s linear infinite;
+        }
+        .scroll-ribbon:hover {
+            animation-play-state: paused;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .store-pill {
+            transition: all 0.2s ease;
+        }
+        .store-pill:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-900">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">VoiceCart</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#how-it-works" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition">How It Works</a>
+                    <a href="#stores" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition">Stores</a>
+                    <a href="#pricing" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition">Pricing</a>
+                    <a href="#faq" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition">FAQ</a>
+                </div>
+                <a href="#pricing" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-lg shadow-brand-500/25">
+                    Get Started
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-3 mb-6">
+                        <span class="inline-flex items-center gap-2 bg-brand-100 text-brand-700 px-4 py-2 rounded-full text-sm font-medium">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                            </svg>
+                            iPhone Only
+                        </span>
+                        <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium">
+                            Apple Shortcuts Powered
+                        </span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
+                        Search Instacart<br>
+                        <span class="text-brand-500">With Your Voice</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
+                        Say goodbye to typing. Just speak what you need, and VoiceCart instantly searches your favorite Instacart store. Perfect for busy parents and multitaskers.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#pricing" class="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition shadow-xl shadow-brand-500/30">
+                            Get VoiceCart
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </a>
+                        <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-full text-lg font-semibold transition border border-gray-200">
+                            See How It Works
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-6 mt-10 pt-8 border-t border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">No subscription</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">Pay once, own forever</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">Instant setup</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative hidden md:block">
+                    <div class="absolute inset-0 bg-brand-400/20 rounded-full blur-3xl pulse-ring"></div>
+                    <div class="relative float">
+                        <!-- Phone Mockup -->
+                        <div class="bg-gray-900 rounded-[3rem] p-3 shadow-2xl max-w-[300px] mx-auto">
+                            <div class="bg-white rounded-[2.5rem] overflow-hidden">
+                                <!-- Status Bar -->
+                                <div class="bg-gray-100 px-6 py-3 flex justify-between items-center">
+                                    <span class="text-xs font-medium">9:41</span>
+                                    <div class="w-20 h-6 bg-gray-900 rounded-full"></div>
+                                    <div class="flex gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v18m-6-6l6 6 6-6"/></svg>
+                                    </div>
+                                </div>
+                                <!-- Content -->
+                                <div class="p-6 pb-8">
+                                    <div class="text-center mb-6">
+                                        <div class="w-20 h-20 bg-brand-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                            </svg>
+                                        </div>
+                                        <p class="text-lg font-semibold text-gray-900">Listening...</p>
+                                    </div>
+                                    <div class="bg-gray-100 rounded-2xl p-4 mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                                            <p class="text-gray-700 font-medium">"Organic milk"</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-center gap-1">
+                                        <div class="w-2 h-8 bg-brand-400 rounded-full animate-pulse"></div>
+                                        <div class="w-2 h-12 bg-brand-500 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
+                                        <div class="w-2 h-6 bg-brand-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                                        <div class="w-2 h-10 bg-brand-500 rounded-full animate-pulse" style="animation-delay: 0.3s"></div>
+                                        <div class="w-2 h-8 bg-brand-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="py-12 bg-white border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">2 seconds</p>
+                    <p class="text-sm text-gray-500">Average search time</p>
+                </div>
+                <div class="hidden md:block w-px h-12 bg-gray-200"></div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">28+</p>
+                    <p class="text-sm text-gray-500">Supported stores</p>
+                </div>
+                <div class="hidden md:block w-px h-12 bg-gray-200"></div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">100%</p>
+                    <p class="text-sm text-gray-500">Hands-free</p>
+                </div>
+                <div class="hidden md:block w-px h-12 bg-gray-200"></div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">$0/mo</p>
+                    <p class="text-sm text-gray-500">No subscriptions ever</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Animated Store Ribbon -->
+    <section class="py-8 bg-gray-50 overflow-hidden border-b border-gray-100">
+        <div class="relative">
+            <div class="scroll-ribbon">
+                <!-- First set of pills -->
+                <div class="flex gap-3 pr-3">
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Walmart</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Kroger</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Costco</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Albertsons</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Publix</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Target</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Sam's Club</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Aldi</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">H-E-B</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Stop & Shop</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Meijer</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Wegmans</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Giant Eagle</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">ShopRite</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Hy-Vee</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">WinCo Foods</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Safeway</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Vons</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Ralphs</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Fred Meyer</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Harris Teeter</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Food Lion</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Giant Food</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Hannaford</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">King Soopers</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">ACME</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Jewel-Osco</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Shaw's</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-brand-500 rounded-full text-sm font-medium text-white shadow-sm">Sprouts</span>
+                </div>
+                <!-- Duplicate set for seamless loop -->
+                <div class="flex gap-3 pr-3">
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Walmart</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Kroger</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Costco</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Albertsons</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Publix</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Target</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Sam's Club</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Aldi</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">H-E-B</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Stop & Shop</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Meijer</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Wegmans</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Giant Eagle</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">ShopRite</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Hy-Vee</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">WinCo Foods</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Safeway</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Vons</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Ralphs</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Fred Meyer</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Harris Teeter</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Food Lion</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Giant Food</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Hannaford</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">King Soopers</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">ACME</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Jewel-Osco</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm">Shaw's</span>
+                    <span class="store-pill whitespace-nowrap px-4 py-2 bg-brand-500 rounded-full text-sm font-medium text-white shadow-sm">Sprouts</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 md:py-28 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How VoiceCart Works</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Get set up in under a minute and start searching with your voice instantly.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="bg-brand-50 rounded-3xl p-8 h-full">
+                        <div class="w-12 h-12 bg-brand-500 text-white rounded-2xl flex items-center justify-center text-xl font-bold mb-6">1</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Choose Your Store</h3>
+                        <p class="text-gray-600">Select from popular Instacart stores like Costco, Kroger, Publix, and more. Pick one store or get unlimited access to all.</p>
+                    </div>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="bg-brand-50 rounded-3xl p-8 h-full">
+                        <div class="w-12 h-12 bg-brand-500 text-white rounded-2xl flex items-center justify-center text-xl font-bold mb-6">2</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Install the Shortcut</h3>
+                        <p class="text-gray-600">Add the Apple Shortcut to your iPhone. Assign it to your Action Button or add it to your Home Screen for instant access.</p>
+                    </div>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative">
+                    <div class="bg-brand-50 rounded-3xl p-8 h-full">
+                        <div class="w-12 h-12 bg-brand-500 text-white rounded-2xl flex items-center justify-center text-xl font-bold mb-6">3</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Speak & Search</h3>
+                        <p class="text-gray-600">Tap the shortcut or press your Action Button, say what you need, and VoiceCart searches Instacart instantly. That's it!</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Demo Video Placeholder -->
+            <div class="mt-16 bg-gray-900 rounded-3xl overflow-hidden shadow-2xl max-w-4xl mx-auto">
+                <div class="aspect-video flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-white/20 transition">
+                            <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <p class="text-white/60 text-sm">Watch VoiceCart in action</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="py-20 md:py-28 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Perfect For...</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">VoiceCart fits seamlessly into your busy lifestyle.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">Busy Parents</h3>
+                    <p class="text-sm text-gray-600">Add items to your list while juggling kids, cooking, or driving.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">Professionals</h3>
+                    <p class="text-sm text-gray-600">Quickly add groceries between meetings without breaking focus.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">Home Cooks</h3>
+                    <p class="text-sm text-gray-600">Spot a missing ingredient while cooking? Search hands-free instantly.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-2">Efficiency Lovers</h3>
+                    <p class="text-sm text-gray-600">Skip the typing and searching. Voice is simply faster.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stores Section -->
+    <section id="stores" class="py-20 md:py-28 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">28+ Supported Stores</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">VoiceCart works with the most popular grocery stores on Instacart.</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Walmart</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Kroger</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Costco</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Albertsons</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Publix</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Target</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Sam's Club</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Aldi</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">H-E-B</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Stop & Shop</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Meijer</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Wegmans</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Giant Eagle</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">ShopRite</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Hy-Vee</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">WinCo Foods</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Harris Teeter</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Food Lion</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Giant Food</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Ralphs</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Fred Meyer</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">King Soopers</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Safeway</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Vons</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">ACME</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Jewel-Osco</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Shaw's</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Hannaford</span>
+                <span class="store-pill px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm">Sprouts</span>
+            </div>
+
+            <p class="text-center text-gray-500 mt-10 text-sm">More stores added regularly. With Unlimited, you get access to new stores as they're added.</p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 bg-brand-100 text-brand-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    No subscription required
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple, One-Time Pricing</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Pay once, use forever. No hidden fees, no recurring charges.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Single Store -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-200">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Single Store</h3>
+                        <p class="text-gray-600">Perfect if you shop at one store</p>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-5xl font-extrabold text-gray-900">$3</span>
+                        <span class="text-gray-500 ml-2">one-time</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-600">1 store shortcut of your choice</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-600">Voice-activated search</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-600">Works with Action Button</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-600">Lifetime access</span>
+                        </li>
+                    </ul>
+                    <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 py-4 rounded-full font-semibold transition">
+                        Choose Single Store
+                    </button>
+                </div>
+                <!-- Unlimited Stores -->
+                <div class="bg-brand-500 rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        Best Value
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Unlimited Stores</h3>
+                        <p class="text-brand-100">Access every supported store</p>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-5xl font-extrabold text-white">$10</span>
+                        <span class="text-brand-100 ml-2">one-time</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">All 28+ store shortcuts</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Future stores included free</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Voice-activated search</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Works with Action Button</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Lifetime access</span>
+                        </li>
+                    </ul>
+                    <button class="w-full bg-white hover:bg-gray-100 text-brand-600 py-4 rounded-full font-semibold transition shadow-lg">
+                        Get Unlimited Access
+                    </button>
+                </div>
+            </div>
+            <p class="text-center text-gray-500 mt-8 text-sm">Secure payment powered by Polar. Instant delivery after purchase. <span class="font-medium">Requires iPhone with iOS 16+.</span></p>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 md:py-28 bg-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                <p class="text-lg text-gray-600">Got questions? We've got answers.</p>
+            </div>
+            <div class="space-y-4">
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">What do I need to use VoiceCart?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        <strong>VoiceCart is iPhone only.</strong> You need an iPhone running iOS 16 or later with the Shortcuts app (it comes pre-installed). You'll also need the Instacart app installed on your phone. Unfortunately, VoiceCart does not work on Android devices or iPads.
+                    </div>
+                </details>
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">Is this a subscription?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        No! VoiceCart is a one-time purchase. Pay once and use it forever. No monthly fees, no annual renewals, no hidden charges.
+                    </div>
+                </details>
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">How does the shortcut work?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        When you activate the shortcut (via Home Screen icon or Action Button), it prompts you to speak. Your voice is converted to text and used to search your selected store on Instacart. The search results page opens automatically in the Instacart app.
+                    </div>
+                </details>
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">Can I use multiple stores?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        Yes! Each store has its own shortcut. With the Unlimited plan ($10), you get shortcuts for all supported stores. With the Single Store plan ($3), you choose one store. You can always upgrade later.
+                    </div>
+                </details>
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">What's the Action Button?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        The Action Button is a customizable button on iPhone 15 Pro and newer models. You can set it to run any shortcut with a single press. Assign VoiceCart to it for instant voice searches without even unlocking your phone or opening an app.
+                    </div>
+                </details>
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">How do I get the shortcut after purchase?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        After your purchase is confirmed, you'll receive an email with download links for your shortcut(s). Simply tap the link on your iPhone to add it to your Shortcuts app. The whole process takes less than a minute.
+                    </div>
+                </details>
+                <!-- FAQ Item -->
+                <details class="group bg-gray-50 rounded-2xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                        <h3 class="font-semibold text-gray-900">Does this add items to my cart automatically?</h3>
+                        <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600">
+                        VoiceCart searches for items and opens the results in Instacart. From there, you can tap to add specific items to your cart. This gives you control over exactly which product, brand, and size you want.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 md:py-28 bg-brand-500">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Shop Smarter?</h2>
+            <p class="text-xl text-brand-100 mb-8 max-w-2xl mx-auto">Join thousands of people who've simplified their grocery shopping with VoiceCart. Set it up once, use it forever.</p>
+            <a href="#pricing" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-brand-600 px-8 py-4 rounded-full text-lg font-semibold transition shadow-xl">
+                Get VoiceCart Now
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </a>
+            <p class="text-brand-200 mt-6 text-sm">One-time purchase. No subscription. Instant access.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">VoiceCart</span>
+                    </div>
+                    <p class="text-sm max-w-xs">Voice-powered grocery search for Instacart. Built with Apple Shortcuts for seamless integration with your iPhone.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#how-it-works" class="hover:text-white transition">How It Works</a></li>
+                        <li><a href="#stores" class="hover:text-white transition">Stores</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#faq" class="hover:text-white transition">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm">&copy; 2025 VoiceCart. All rights reserved.</p>
+                <p class="text-sm">VoiceCart is not affiliated with Instacart or Apple Inc.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
