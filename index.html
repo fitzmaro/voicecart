@@ -233,15 +233,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="relative hidden md:block">
+                <div class="relative mt-12 md:mt-0">
                     <div class="absolute inset-0 bg-brand-400/20 rounded-full blur-3xl pulse-ring"></div>
                     <div class="relative float">
                         <!-- iPhone 15 Mockup with Video -->
-                        <div class="relative mx-auto" style="width: 280px;">
+                        <div class="relative mx-auto w-[200px] md:w-[280px]">
                             <!-- Phone Frame -->
-                            <div class="bg-gray-900 rounded-[3rem] p-2 shadow-2xl">
+                            <div class="bg-gray-900 rounded-[2.5rem] md:rounded-[3rem] p-1.5 md:p-2 shadow-2xl">
                                 <!-- Screen Container -->
-                                <div class="relative bg-black rounded-[2.5rem] overflow-hidden">
+                                <div class="relative bg-black rounded-[2rem] md:rounded-[2.5rem] overflow-hidden">
                                     <!-- Video -->
                                     <video autoplay loop muted playsinline class="w-full h-auto block">
                                         <source src="demo.mp4" type="video/mp4">
@@ -249,20 +249,20 @@
                                 </div>
                             </div>
                             <!-- Side Button (Power) -->
-                            <div class="absolute right-[-2px] top-28 w-1 h-12 bg-gray-700 rounded-r-sm"></div>
-                            <!-- Action Button Callout -->
-                            <div class="absolute left-[-140px] top-14 w-32 text-right">
+                            <div class="absolute right-[-2px] top-20 md:top-28 w-1 h-8 md:h-12 bg-gray-700 rounded-r-sm"></div>
+                            <!-- Action Button Callout - hidden on mobile -->
+                            <div class="hidden md:block absolute left-[-140px] top-14 w-32 text-right">
                                 <p class="text-sm font-semibold text-gray-700">Finally, a use for that Action Button</p>
                             </div>
                             <!-- Action Button with Glow -->
-                            <div class="absolute left-[-3px] top-24 w-1.5 h-6 bg-brand-500 rounded-l-sm action-btn-glow"></div>
-                            <!-- Glow Rays -->
-                            <div class="action-ray" style="left: -32px; top: 102px; transform: rotate(15deg);"></div>
-                            <div class="action-ray" style="left: -34px; top: 110px; transform: rotate(0deg);"></div>
-                            <div class="action-ray" style="left: -32px; top: 118px; transform: rotate(-15deg);"></div>
+                            <div class="absolute left-[-3px] top-16 md:top-24 w-1.5 h-5 md:h-6 bg-brand-500 rounded-l-sm action-btn-glow"></div>
+                            <!-- Glow Rays - hidden on mobile -->
+                            <div class="hidden md:block action-ray" style="left: -32px; top: 102px; transform: rotate(15deg);"></div>
+                            <div class="hidden md:block action-ray" style="left: -34px; top: 110px; transform: rotate(0deg);"></div>
+                            <div class="hidden md:block action-ray" style="left: -32px; top: 118px; transform: rotate(-15deg);"></div>
                             <!-- Volume Buttons -->
-                            <div class="absolute left-[-2px] top-34 w-1 h-10 bg-gray-700 rounded-l-sm" style="top: 136px;"></div>
-                            <div class="absolute left-[-2px] top-44 w-1 h-10 bg-gray-700 rounded-l-sm" style="top: 180px;"></div>
+                            <div class="absolute left-[-2px] w-1 h-7 md:h-10 bg-gray-700 rounded-l-sm" style="top: 100px;"></div>
+                            <div class="absolute left-[-2px] w-1 h-7 md:h-10 bg-gray-700 rounded-l-sm" style="top: 135px;"></div>
                         </div>
                     </div>
                 </div>
