@@ -114,6 +114,23 @@
                 width: 35px;
             }
         }
+        .rotate-item {
+            display: inline-block;
+            perspective: 200px;
+        }
+        .rotate-item-inner {
+            display: inline-block;
+            transform-style: preserve-3d;
+            transition: transform 0.25s ease-in;
+            transform-origin: center bottom;
+        }
+        .rotate-item-inner.flip-out {
+            transform: rotateX(-90deg);
+        }
+        .rotate-item-inner.flip-in {
+            transition: none;
+            transform: rotateX(90deg);
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-gray-900">
@@ -195,7 +212,7 @@
                         </span>
                     </div>
                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                        You forgot the <span id="rotating-item" class="text-brand-500 transition-opacity duration-300">milk</span>. <span class="text-brand-500">Again.</span>
+                        You forgot the <span class="rotate-item"><span id="rotating-item" class="text-brand-500 rotate-item-inner">milk</span></span>. <span class="text-brand-500">Again.</span>
                     </h1>
                     <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
                         It's 9pm. Kids are finally asleep. You remember three things you needed from the store - but by the time you open the app, you've forgotten two. VoiceCart captures the thought the moment you have it.
@@ -929,15 +946,28 @@
         const rotatingEl = document.getElementById('rotating-item');
 
         function rotateItem() {
-            rotatingEl.style.opacity = '0';
+            // Flip out (rotate down)
+            rotatingEl.classList.add('flip-out');
+
             setTimeout(() => {
+                // Change text while hidden
                 currentIndex = (currentIndex + 1) % items.length;
                 rotatingEl.textContent = items[currentIndex];
-                rotatingEl.style.opacity = '1';
-            }, 300);
+
+                // Position for flip in (rotated up)
+                rotatingEl.classList.remove('flip-out');
+                rotatingEl.classList.add('flip-in');
+
+                // Trigger flip in
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        rotatingEl.classList.remove('flip-in');
+                    });
+                });
+            }, 250);
         }
 
-        setInterval(rotateItem, 2500);
+        setInterval(rotateItem, 1000);
     </script>
 <!-- Cloudflare Web Analytics -->
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "b8f47f6f1e5b4a618d01c0dcdb0c60e9"}'></script>
