@@ -195,7 +195,7 @@
                         </span>
                     </div>
                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                        You forgot the milk. <span class="text-brand-500">Again.</span>
+                        You forgot the <span id="rotating-item" class="text-brand-500 transition-opacity duration-300">milk</span>. <span class="text-brand-500">Again.</span>
                     </h1>
                     <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
                         It's 9pm. Kids are finally asleep. You remember three things you needed from the store - but by the time you open the app, you've forgotten two. VoiceCart captures the thought the moment you have it.
@@ -920,6 +920,24 @@
                 }
             });
         });
+    </script>
+
+    <!-- Rotating headline text -->
+    <script>
+        const items = ['milk', 'diapers', 'olive oil', 'paper towels', 'ketchup', 'eggs', 'bread', 'bananas', 'coffee'];
+        let currentIndex = 0;
+        const rotatingEl = document.getElementById('rotating-item');
+
+        function rotateItem() {
+            rotatingEl.style.opacity = '0';
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % items.length;
+                rotatingEl.textContent = items[currentIndex];
+                rotatingEl.style.opacity = '1';
+            }, 300);
+        }
+
+        setInterval(rotateItem, 2500);
     </script>
 <!-- Cloudflare Web Analytics -->
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "b8f47f6f1e5b4a618d01c0dcdb0c60e9"}'></script>
